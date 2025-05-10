@@ -2,7 +2,7 @@ import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, BoxGeometry, Color, CylinderGeometry, DirectionalLight, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, Quaternion, Scene, SphereGeometry, TorusGeometry, TorusKnotGeometry, Vector3 } from 'three';
 import { acceleratedRaycast, computeBatchedBoundsTree } from 'three-mesh-bvh';
 import { FlyControls } from 'three/addons/Addons.js';
-import '../src/index_webgl.js';
+import '@three.ez/batched-mesh-extensions';
 
 Mesh.prototype.raycast = acceleratedRaycast;
 BatchedMesh.prototype.computeBoundsTree = computeBatchedBoundsTree;

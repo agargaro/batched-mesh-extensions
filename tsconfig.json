@@ -13,6 +13,11 @@
     "outDir": "dist/src",
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@three.ez/batched-mesh-extensions": [
+        "./src/index_webgl.js"
+      ]
+    },
   }
 }

@@ -1,7 +1,7 @@
 import { BatchedMesh, BoxGeometry, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
-import { getVertexAndIndexCount, patchBatchedMesh } from '../src/index_webgl.js';
+import { getVertexAndIndexCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();
