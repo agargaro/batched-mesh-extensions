@@ -1,5 +1,5 @@
 import { BatchedMesh } from 'three';
-import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../utils/SquareDataTexture.js';
+import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../SquareDataTexture.js';
 
 type UniformSchema = { [x: string]: UniformType };
 type UniformSchemaShader = { vertex?: UniformSchema; fragment?: UniformSchema };

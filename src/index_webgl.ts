@@ -5,10 +5,10 @@ export * from './core/feature/FrustumCulling.js';
 export * from './core/feature/GetPositionAt.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
-export * from './core/utils/BatchedMeshBVH.js';
+export * from './core/BatchedMeshBVH.js';
 export * from './core/utils/MultiDrawRenderList.js';
 export * from './core/utils/SortingUtils.js';
-export * from './core/utils/SquareDataTexture.js';
+export * from './core/SquareDataTexture.js';
 export * from './core/Patch.js';
 
 /** @internal */
