@@ -2,7 +2,7 @@ import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { AmbientLight, BatchedMesh, BoxGeometry, Color, CylinderGeometry, DirectionalLight, Matrix4, Mesh, MeshBasicMaterial, MeshLambertMaterial, Quaternion, Scene, SphereGeometry, TorusGeometry, TorusKnotGeometry, Vector3 } from 'three';
 import { acceleratedRaycast, computeBatchedBoundsTree } from 'three-mesh-bvh';
 import { FlyControls } from 'three/addons/Addons.js';
-import '../src/index_webgl.js';
+import '@three.ez/batched-mesh-extensions';
 
 Mesh.prototype.raycast = acceleratedRaycast;
 BatchedMesh.prototype.computeBoundsTree = computeBatchedBoundsTree;
@@ -61,7 +61,7 @@ for (let i = 0; i < count; i++) {
   quaternion.random();
   scale.set(Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
   batchedMesh.setMatrixAt(id, matrix.compose(position, quaternion, scale));
-  batchedMesh.setColorAt(id, color.setHex(Math.random() * 0xffffff));
+  batchedMesh.setColorAt(id, color.setHSL(Math.random(), 1, 0.5));
 }
 
 scene.add(batchedMesh);

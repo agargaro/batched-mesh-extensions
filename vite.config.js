@@ -5,6 +5,11 @@ import { externalizeDeps } from 'vite-plugin-externalize-deps';
 
 export default defineConfig(({ command }) => ({
   publicDir: command === 'build' ? false : 'public',
+  resolve: {
+    alias: {
+      '@three.ez/batched-mesh-extensions': resolve(__dirname, 'src/index_webgl.ts')
+    }
+  },
   build: {
     sourcemap: true,
     lib: {
