@@ -1,8 +1,7 @@
-import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { getVertexAndIndexCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
-import { color } from 'three/tsl';
+import { Main, PerspectiveCameraAuto } from '@three.ez/main';
+import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry } from 'three';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();

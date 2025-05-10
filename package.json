@@ -57,6 +57,7 @@
     "vite-plugin-static-copy": "^2.2.0"
   },
   "peerDependencies": {
+    "meshoptimizer": ">=0.23.0",
     "three": ">=0.159.0"
   },
   "dependencies": {

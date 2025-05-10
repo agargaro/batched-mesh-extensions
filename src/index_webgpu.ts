@@ -5,4 +5,5 @@ export * from './core/feature/Raycasting.js';
 export * from './core/BatchedMeshBVH.js';
 export * from './core/utils/MultiDrawRenderList.js';
 export * from './core/utils/SortingUtils.js';
+export * from './utils/CreateSimplifiedGeometry.js';
 export * from './utils/GetVertexAndIndexCount.js';
