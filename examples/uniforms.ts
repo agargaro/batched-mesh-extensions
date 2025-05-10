@@ -1,7 +1,7 @@
 import { BatchedMesh, BoxGeometry, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
-import { patchBatchedMesh } from '../src/index_webgl.js';
+import { getVertexAndIndexCount, patchBatchedMesh } from '../src/index_webgl.js';
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();
@@ -14,7 +14,8 @@ const box = new BoxGeometry(1, 1, 1);
 const sphere = new SphereGeometry(1, 12, 12);
 const material = new MeshBasicMaterial({ transparent: true, depthWrite: false });
 
-const batchedMesh = new BatchedMesh(10, 5000, 10000, material);
+const { vertexCount, indexCount } = getVertexAndIndexCount([box, sphere]);
+const batchedMesh = new BatchedMesh(10, vertexCount, indexCount, material);
 scene.add(batchedMesh);
 
 const boxGeometryId = batchedMesh.addGeometry(box);
