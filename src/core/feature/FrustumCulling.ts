@@ -202,7 +202,7 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) 
       count = geometryInfo.count;
     }
 
-    // TODO don't reuse getPosition at for sort
+    // TODO don't reuse getPositionAt for sort
 
     if (sortObjects) {
       const depth = this.getPositionAt(index).sub(_cameraPos).dot(_forward);

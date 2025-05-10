@@ -4,6 +4,7 @@ import { LODInfo } from './core/feature/LOD.js';
 export * from './core/feature/ComputeBVH.js';
 export * from './core/feature/FrustumCulling.js';
 export * from './core/feature/GetPositionAt.js';
+export * from './core/feature/LOD.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
 export * from './core/BatchedMeshBVH.js';

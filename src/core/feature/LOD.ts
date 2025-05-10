@@ -12,7 +12,7 @@ declare module 'three' {
   }
 }
 
-BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance, hysteresis?) {
+BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance, hysteresis = 0) {
   const geometryInfo = this._geometryInfo[geometryId];
   distance = distance ** 2;
 
@@ -20,10 +20,11 @@ BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance,
     geometryInfo.LOD = [{ start: geometryInfo.start, count: geometryInfo.count, distance: 0, hysteresis: 0 }]; // TODO e se non è primo livello?
   }
 
+  const drawRange = geometry.drawRange;
   const LOD = geometryInfo.LOD;
-  const lastLOD = LOD[LOD.length];
-  const start = lastLOD.start + lastLOD.count;
-  const count = geometry.index.count;
+  const lastLOD = LOD[LOD.length - 1];
+  const start = lastLOD.start + lastLOD.count; // + drawRange.start; TODO
+  const count = drawRange.count;
 
   if ((start - geometryInfo.start) + count > geometryInfo.reservedIndexCount) {
     throw new Error('BatchedMesh LOD: Reserved space request exceeds the maximum buffer size.');
@@ -31,7 +32,7 @@ BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance,
 
   LOD.push({ start, count, distance, hysteresis });
 
-  const srcIndex = this.geometry.getIndex();
+  const srcIndex = geometry.getIndex();
   const dstIndex = this.geometry.getIndex();
   dstIndex.set(srcIndex.array, start);
   dstIndex.needsUpdate = true;
