@@ -61,7 +61,7 @@ for (let i = 0; i < count; i++) {
   quaternion.random();
   scale.set(Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5, Math.random() * 1.5 + 0.5);
   batchedMesh.setMatrixAt(id, matrix.compose(position, quaternion, scale));
-  batchedMesh.setColorAt(id, color.setHex(Math.random() * 0xffffff));
+  batchedMesh.setColorAt(id, color.setHSL(Math.random(), 1, 0.5));
 }
 
 scene.add(batchedMesh);

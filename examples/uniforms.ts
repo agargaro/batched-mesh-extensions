@@ -1,7 +1,8 @@
-import { BatchedMesh, BoxGeometry, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
+import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { getVertexAndIndexCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
+import { color } from 'three/tsl';
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();
@@ -36,10 +37,10 @@ batchedMesh.setMatrixAt(sphereInstancedId2, new Matrix4().makeTranslation(1, 1, 
 patchBatchedMesh(batchedMesh);
 batchedMesh.initUniformsPerInstance({ fragment: { diffuse: 'vec3', opacity: 'float' } });
 
-batchedMesh.setUniformAt(0, 'diffuse', new Vector3(1, 0, 0));
-batchedMesh.setUniformAt(1, 'diffuse', new Vector3(0, 1, 0));
-batchedMesh.setUniformAt(2, 'diffuse', new Vector3(0, 0, 1));
-batchedMesh.setUniformAt(3, 'diffuse', new Vector3(1, 1, 0));
+batchedMesh.setUniformAt(0, 'diffuse', new Color(0xDC0073));
+batchedMesh.setUniformAt(1, 'diffuse', new Color(0x89FC00));
+batchedMesh.setUniformAt(2, 'diffuse', new Color(0x00A1E4));
+batchedMesh.setUniformAt(3, 'diffuse', new Color(0xF5B700));
 
 batchedMesh.setUniformAt(0, 'opacity', 0.5);
 batchedMesh.setUniformAt(1, 'opacity', 0.5);
