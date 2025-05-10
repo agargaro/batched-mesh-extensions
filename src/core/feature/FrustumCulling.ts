@@ -15,9 +15,11 @@ export type CustomSortCallback = (list: MultiDrawRenderItem[]) => void;
  * Callback invoked when an instance is within the frustum.
  * @param index The index of the instance.
  * @param camera The camera used for rendering.
+ * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
+ * @param LODIndex The LOD level of the instance (provided only if LODs are initialized and `sortObjects` is false).
  * @returns True if the instance should be rendered, false otherwise.
  */
-export type OnFrustumEnterCallback = (index: number, camera: Camera) => boolean;
+export type OnFrustumEnterCallback = (index: number, camera: Camera, cameraLOD?: Camera, LODIndex?: number) => boolean;
 
 declare module 'three' {
   interface BatchedMesh {
@@ -29,14 +31,15 @@ declare module 'three' {
     /**
      * Performs frustum culling and sorting.
      * @param camera The main camera used for rendering.
+     * @param cameraLOD TODO
      */
-    performFrustumCulling(camera: Camera): void;
+    performFrustumCulling(camera: Camera, cameraLOD?: Camera): void;
 
-    /** @internal */ frustumCulling(camera: Camera): void;
+    /** @internal */ frustumCulling(camera: Camera, cameraLOD: Camera): void;
     /** @internal */ updateIndexArray(): void;
     /** @internal */ updateRenderList(): void;
-    /** @internal */ BVHCulling(camera: Camera): void;
-    /** @internal */ linearCulling(camera: Camera): void;
+    /** @internal */ BVHCulling(camera: Camera, cameraLOD: Camera): void;
+    /** @internal */ linearCulling(camera: Camera, cameraLOD: Camera): void;
   }
 }
 
@@ -46,25 +49,26 @@ const _projScreenMatrix = new Matrix4();
 const _invMatrixWorld = new Matrix4();
 const _forward = new Vector3();
 const _cameraPos = new Vector3();
+const _cameraLODPos = new Vector3();
 const _position = new Vector3();
 const _sphere = new Sphere();
 
 BatchedMesh.prototype.onBeforeRender = function (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
-  // TODO add autoupdate flag
+  // TODO check if nothing changed
   this.performFrustumCulling(camera);
 };
 
-BatchedMesh.prototype.performFrustumCulling = function (camera: Camera) {
+BatchedMesh.prototype.performFrustumCulling = function (camera, cameraLOD = camera) {
   if (!this._visibilityChanged && !this.perObjectFrustumCulled && !this.sortObjects) {
     return;
   }
 
-  this.frustumCulling(camera);
+  this.frustumCulling(camera, cameraLOD);
   this._indirectTexture.needsUpdate = true;
   this._visibilityChanged = false;
 };
 
-BatchedMesh.prototype.frustumCulling = function (camera: Camera) {
+BatchedMesh.prototype.frustumCulling = function (camera, cameraLOD) {
   const sortObjects = this.sortObjects;
   const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
@@ -76,6 +80,7 @@ BatchedMesh.prototype.frustumCulling = function (camera: Camera) {
   if (sortObjects) {
     _invMatrixWorld.copy(this.matrixWorld).invert();
     _cameraPos.setFromMatrixPosition(camera.matrixWorld).applyMatrix4(_invMatrixWorld);
+    _cameraLODPos.setFromMatrixPosition(cameraLOD.matrixWorld).applyMatrix4(_invMatrixWorld);
     _forward.set(0, 0, -1).transformDirection(camera.matrixWorld).transformDirection(_invMatrixWorld);
   }
 
@@ -84,8 +89,8 @@ BatchedMesh.prototype.frustumCulling = function (camera: Camera) {
   } else {
     _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(this.matrixWorld);
 
-    if (this.bvh) this.BVHCulling(camera);
-    else this.linearCulling(camera);
+    if (this.bvh) this.BVHCulling(camera, cameraLOD);
+    else this.linearCulling(camera, cameraLOD);
   }
 
   if (sortObjects) {
@@ -160,7 +165,7 @@ BatchedMesh.prototype.updateRenderList = function () {
   this._multiDrawCount = _renderList.array.length;
 };
 
-BatchedMesh.prototype.BVHCulling = function (camera: Camera) {
+BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) {
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
   const instanceInfo = this._instanceInfo;
@@ -169,36 +174,51 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera) {
   const multiDrawStarts = this._multiDrawStarts;
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data;
-  const onFrustumEnter = this.onFrustumEnter;
-  let count = 0;
+  const onFrustumEnter = this.onFrustumEnter; // TODO add LODs
+  let instancesCount = 0;
 
   this.bvh.frustumCulling(_projScreenMatrix, (node: BVHNode<{}, number>) => {
     const index = node.object;
     const instance = instanceInfo[index];
 
-    // TODO how to index < instancesArrayCount?
-
     // we don't check if active because we remove inactive instances from BVH
-    if (instance.visible && (!onFrustumEnter || onFrustumEnter(index, camera))) {
-      const geometryId = instance.geometryIndex;
-      const geometryInfo = geometryInfoList[geometryId];
+    if (!instance.visible) return;
 
-      if (sortObjects) {
-        const depth = this.getPositionAt(index).sub(_cameraPos).dot(_forward);
-        _renderList.push(index, depth, geometryInfo.start, geometryInfo.count);
-      } else {
-        multiDrawStarts[count] = geometryInfo.start * bytesPerElement;
-        multiDrawCounts[count] = geometryInfo.count;
-        indirectArray[count] = index;
-        count++;
-      }
+    const geometryId = instance.geometryIndex;
+    const geometryInfo = geometryInfoList[geometryId];
+    const LOD = geometryInfo.LOD;
+    let start: number;
+    let count: number;
+
+    if (LOD) {
+      const distance = this.getPositionAt(index).distanceToSquared(_cameraLODPos);
+      const LODIndex = this.getLODIndex(LOD, distance);
+      if (onFrustumEnter && !onFrustumEnter(index, camera, cameraLOD, LODIndex)) return;
+      start = LOD[LODIndex].start;
+      count = LOD[LODIndex].count;
+    } else {
+      if (onFrustumEnter && !onFrustumEnter(index, camera)) return;
+      start = geometryInfo.start;
+      count = geometryInfo.count;
+    }
+
+    // TODO don't reuse getPosition at for sort
+
+    if (sortObjects) {
+      const depth = this.getPositionAt(index).sub(_cameraPos).dot(_forward);
+      _renderList.push(index, depth, start, count);
+    } else {
+      multiDrawStarts[instancesCount] = start * bytesPerElement;
+      multiDrawCounts[instancesCount] = count;
+      indirectArray[instancesCount] = index;
+      instancesCount++;
     }
   });
 
-  this._multiDrawCount = sortObjects ? _renderList.array.length : count;
+  this._multiDrawCount = sortObjects ? _renderList.array.length : instancesCount;
 };
 
-BatchedMesh.prototype.linearCulling = function (camera: Camera) {
+BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camera) {
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
   const instanceInfo = this._instanceInfo;
