@@ -32,9 +32,15 @@ BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance,
 
   LOD.push({ start, count, distance, hysteresis });
 
-  const srcIndex = geometry.getIndex();
+  const srcIndexArray = geometry.getIndex().array;
   const dstIndex = this.geometry.getIndex();
-  dstIndex.set(srcIndex.array, start);
+  const dstIndexArray = dstIndex.array;
+  const vertexStart = geometryInfo.vertexStart;
+
+  for (let i = 0; i < count; i++) {
+    dstIndexArray[start + i] = srcIndexArray[i] + vertexStart;
+  }
+
   dstIndex.needsUpdate = true;
 };
 
