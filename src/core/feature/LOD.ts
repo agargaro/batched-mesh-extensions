@@ -16,9 +16,7 @@ BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance,
   const geometryInfo = this._geometryInfo[geometryId];
   distance = distance ** 2;
 
-  if (!geometryInfo.LOD) {
-    geometryInfo.LOD = [{ start: geometryInfo.start, count: geometryInfo.count, distance: 0, hysteresis: 0 }]; // TODO e se non è primo livello?
-  }
+  geometryInfo.LOD ??= [{ start: geometryInfo.start, count: geometryInfo.count, distance: 0, hysteresis: 0 }];
 
   const drawRange = geometry.drawRange;
   const LOD = geometryInfo.LOD;
