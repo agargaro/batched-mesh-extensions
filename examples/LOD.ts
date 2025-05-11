@@ -10,19 +10,20 @@ main.createView({ scene, camera });
 const controls = new OrbitControls(camera, main.renderer.domElement);
 controls.update();
 
-const geometry1 = new TorusKnotGeometry();
-const geometry2 = new SphereGeometry();
+const geometry1 = new SphereGeometry();
+const geometry2 = new TorusKnotGeometry();
+
+const LODGeo1 = await createSimplifiedGeometry(geometry1, { error: 1, ratio: 0.2, lockBorder: true });
+const LODGeo2 = await createSimplifiedGeometry(geometry2, { error: 1, ratio: 0.2, lockBorder: true });
 
 const { vertexCount, indexCount } = getVertexAndIndexCount([geometry1, geometry2]);
-const batchedMesh = new BatchedMesh(10, vertexCount, indexCount + 10000, new MeshLambertMaterial());
-scene.add(batchedMesh, new DirectionalLight(), new AmbientLight());
 
-const geometryId = batchedMesh.addGeometry(geometry1, -1, 5000);
-const LODGeo = await createSimplifiedGeometry(geometry1, { error: 1, ratio: 0.1 });
-batchedMesh.addGeometryLOD(geometryId, LODGeo, 15);
+const batchedMesh = new BatchedMesh(2, vertexCount, indexCount + LODGeo1.drawRange.count + LODGeo2.drawRange.count, new MeshLambertMaterial());
 
-const geometryId2 = batchedMesh.addGeometry(geometry2, -1, 5000);
-const LODGeo2 = await createSimplifiedGeometry(geometry2, { error: 1, ratio: 0.2, lockBorder: true });
+const geometryId = batchedMesh.addGeometry(geometry1, -1, geometry1.index.count + LODGeo1.drawRange.count);
+const geometryId2 = batchedMesh.addGeometry(geometry2, -1, geometry2.index.count + LODGeo2.drawRange.count);
+
+batchedMesh.addGeometryLOD(geometryId, LODGeo1, 15);
 batchedMesh.addGeometryLOD(geometryId2, LODGeo2, 15);
 
 const sphereInstancedId1 = batchedMesh.addInstance(geometryId);
@@ -31,3 +32,5 @@ const sphereInstancedId2 = batchedMesh.addInstance(geometryId2);
 batchedMesh.setMatrixAt(sphereInstancedId2, new Matrix4().makeTranslation(1, 1, 0));
 
 batchedMesh.computeBVH(WebGLCoordinateSystem);
+
+scene.add(batchedMesh, new DirectionalLight(), new AmbientLight());
