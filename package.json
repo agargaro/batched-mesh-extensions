@@ -1,6 +1,6 @@
 {
   "name": "@three.ez/batched-mesh-extensions",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Utility extension methods for BatchedMesh",
   "author": "Andrea Gargaro <devgargaro@gmail.com>",
   "license": "MIT",

@@ -1,4 +1,4 @@
-import { getVertexAndIndexCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
+import { getBatchedMeshCount, patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
@@ -14,7 +14,7 @@ const box = new BoxGeometry(1, 1, 1);
 const sphere = new SphereGeometry(1, 12, 12);
 const material = new MeshBasicMaterial({ transparent: true, depthWrite: false });
 
-const { vertexCount, indexCount } = getVertexAndIndexCount([box, sphere]);
+const { vertexCount, indexCount } = getBatchedMeshCount([box, sphere]);
 const batchedMesh = new BatchedMesh(10, vertexCount, indexCount, material);
 scene.add(batchedMesh);
 

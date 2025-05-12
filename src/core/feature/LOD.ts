@@ -18,11 +18,10 @@ BatchedMesh.prototype.addGeometryLOD = function (geometryId, geometry, distance,
 
   geometryInfo.LOD ??= [{ start: geometryInfo.start, count: geometryInfo.count, distance: 0, hysteresis: 0 }];
 
-  const drawRange = geometry.drawRange;
   const LOD = geometryInfo.LOD;
   const lastLOD = LOD[LOD.length - 1];
-  const start = lastLOD.start + lastLOD.count; // + drawRange.start; TODO
-  const count = drawRange.count;
+  const start = lastLOD.start + lastLOD.count;
+  const count = geometry.index.count;
 
   if ((start - geometryInfo.start) + count > geometryInfo.reservedIndexCount) {
     throw new Error('BatchedMesh LOD: Reserved space request exceeds the maximum buffer size.');

@@ -3,8 +3,7 @@ import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene,
 import { MultiDrawRenderItem, MultiDrawRenderList } from '../utils/MultiDrawRenderList.js';
 import { sortOpaque, sortTransparent } from '../utils/SortingUtils.js';
 
-// TODO: add LODs
-// TODO: multidraw array change size to pass to gpu
+// TODO: fix LOD if no sorting and  no culling
 
 /**
  * A custom sorting callback for render items.
@@ -77,12 +76,10 @@ BatchedMesh.prototype.frustumCulling = function (camera, cameraLOD) {
     return;
   }
 
-  if (sortObjects) {
-    _invMatrixWorld.copy(this.matrixWorld).invert();
-    _cameraPos.setFromMatrixPosition(camera.matrixWorld).applyMatrix4(_invMatrixWorld);
-    _cameraLODPos.setFromMatrixPosition(cameraLOD.matrixWorld).applyMatrix4(_invMatrixWorld);
-    _forward.set(0, 0, -1).transformDirection(camera.matrixWorld).transformDirection(_invMatrixWorld);
-  }
+  _invMatrixWorld.copy(this.matrixWorld).invert();
+  _cameraPos.setFromMatrixPosition(camera.matrixWorld).applyMatrix4(_invMatrixWorld);
+  _cameraLODPos.setFromMatrixPosition(cameraLOD.matrixWorld).applyMatrix4(_invMatrixWorld);
+  _forward.set(0, 0, -1).transformDirection(camera.matrixWorld).transformDirection(_invMatrixWorld);
 
   if (!perObjectFrustumCulled) {
     this.updateRenderList();
@@ -203,6 +200,7 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) 
     }
 
     // TODO don't reuse getPositionAt for sort
+    // TODO LOD optimized if bvh and sort?
 
     if (sortObjects) {
       const depth = this.getPositionAt(index).sub(_cameraPos).dot(_forward);
@@ -228,7 +226,7 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camer
   const multiDrawCounts = this._multiDrawCounts;
   const indirectArray = this._indirectTexture.image.data;
   const onFrustumEnter = this.onFrustumEnter;
-  let count = 0;
+  let instancesCount = 0;
 
   _frustum.setFromProjectionMatrix(_projScreenMatrix);
 
@@ -238,6 +236,9 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camer
 
     const geometryId = instance.geometryIndex;
     const geometryInfo = geometryInfoList[geometryId];
+    const LOD = geometryInfo.LOD;
+    let start: number;
+    let count: number;
 
     const bSphere = geometryInfo.boundingSphere;
     const radius = bSphere.radius;
@@ -251,18 +252,32 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camer
       this.applyMatrixAtToSphere(i, _sphere, center, radius);
     }
 
-    if (_frustum.intersectsSphere(_sphere) && (!onFrustumEnter || onFrustumEnter(i, camera))) {
-      if (sortObjects) {
-        const depth = _position.subVectors(_sphere.center, _cameraPos).dot(_forward);
-        _renderList.push(i, depth, geometryInfo.start, geometryInfo.count);
-      } else {
-        multiDrawStarts[count] = geometryInfo.start * bytesPerElement;
-        multiDrawCounts[count] = geometryInfo.count;
-        indirectArray[count] = i;
-        count++;
-      }
+    if (!_frustum.intersectsSphere(_sphere)) continue;
+
+    if (LOD) {
+      const distance = _sphere.center.distanceToSquared(_cameraLODPos);
+      const LODIndex = this.getLODIndex(LOD, distance);
+      if (onFrustumEnter && !onFrustumEnter(i, camera, cameraLOD, LODIndex)) continue;
+      start = LOD[LODIndex].start;
+      count = LOD[LODIndex].count;
+    } else {
+      if (onFrustumEnter && !onFrustumEnter(i, camera)) continue;
+      start = geometryInfo.start;
+      count = geometryInfo.count;
+    }
+
+    // TODO LOD optimized if sort?
+
+    if (sortObjects) {
+      const depth = _position.subVectors(_sphere.center, _cameraPos).dot(_forward);
+      _renderList.push(i, depth, start, count);
+    } else {
+      multiDrawStarts[instancesCount] = start * bytesPerElement;
+      multiDrawCounts[instancesCount] = count;
+      indirectArray[instancesCount] = i;
+      instancesCount++;
     }
   }
 
-  this._multiDrawCount = sortObjects ? _renderList.array.length : count;
+  this._multiDrawCount = sortObjects ? _renderList.array.length : instancesCount;
 };

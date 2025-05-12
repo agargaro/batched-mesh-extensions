@@ -12,8 +12,8 @@ export * from './core/utils/MultiDrawRenderList.js';
 export * from './core/utils/SortingUtils.js';
 export * from './core/SquareDataTexture.js';
 export * from './core/Patch.js';
-export * from './utils/CreateSimplifiedGeometry.js';
-export * from './utils/GetVertexAndIndexCount.js';
+export * from './utils/SimplifyGeometry.js';
+export * from './utils/CountUtils.js';
 
 /** @internal */
 declare module 'three' {
