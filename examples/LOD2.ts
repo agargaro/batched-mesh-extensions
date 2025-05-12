@@ -79,5 +79,5 @@ for (let i = 0; i < instancesCount; i++) {
 batchedMesh.computeBVH(WebGLCoordinateSystem);
 
 scene.add(batchedMesh, new AmbientLight());
-const dirLight = new DirectionalLight();
+const dirLight = new DirectionalLight('white', 2);
 camera.add(dirLight, dirLight.target);
