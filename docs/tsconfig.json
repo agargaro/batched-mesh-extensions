@@ -1,0 +1,13 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "strictNullChecks": false
+  },
+  "exclude": [
+    "public/examples",
+    "src/examples",
+    "src/components/Example/stackblitz-files",
+    "src/components/Example/stackblitz-template.ts",
+    "dist"
+  ]
+}
