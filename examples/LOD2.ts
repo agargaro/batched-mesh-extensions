@@ -41,8 +41,8 @@ batchedMesh.sortObjects = false;
 for (let i = 0; i < geometriesLODArray.length; i++) {
   const geometryLOD = geometriesLODArray[i];
   const geometryId = batchedMesh.addGeometry(geometryLOD[0], -1, LODIndexCount[i]);
-  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 50);
-  batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 100);
+  // batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 50);
+  // batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 100);
   batchedMesh.addGeometryLOD(geometryId, geometryLOD[3], 1);
 }
 
