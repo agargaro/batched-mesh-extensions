@@ -1,0 +1,33 @@
+{
+  "name": "docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "tsc --project tsconfig.build.json & astro dev --host",
+    "start": "tsc --project tsconfig.build.json & astro dev",
+    "build": "tsc --project tsconfig.build.json & astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.2.6",
+    "@astrojs/starlight": "^0.34.3",
+    "@stackblitz/sdk": "^1.11.0",
+    "@three.ez/batched-mesh-extensions": "*",
+    "@three.ez/main": "^0.5.10",
+    "astro": "^5.7.13",
+    "astro-auto-import": "^0.4.4",
+    "sharp": "^0.34.1",
+    "starlight-typedoc": "^0.21.3",
+    "three": "~0.176.0",
+    "three-mesh-bvh": "^0.9.0",
+    "tweakpane": "^4.0.5",
+    "typedoc-plugin-markdown": "^4.6.3",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5"
+  },
+  "devDependencies": {
+    "@types/three": "~0.176.0"
+  }
+}

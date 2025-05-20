@@ -1,0 +1,61 @@
+---
+
+---
+
+<style is:global>
+  /* Unscoped, delivered as-is to the browser. */
+  body {
+    overflow: hidden;
+    div.hero {
+      --sl-color-white: hsl(0, 0%, 100%);
+      --sl-color-gray-2: hsl(224, 6%, 77%);
+    }
+  }
+
+</style>
+<canvas id="three-canvas"></canvas>
+
+<style>
+  #three-canvas {
+    width: 100dvw;
+    height: 100dvh;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    touch-action: none;
+    user-select: none;
+  }
+  #credits-info {
+    position: fixed;
+    padding: 1em;
+    bottom: 0;
+    right: 0;
+    z-index: 2;
+  }
+  #credits-info:hover,
+  #credits-info:focus {
+    + #credits {
+      opacity: 1;
+      display: block;
+    }
+  }
+  #credits {
+    display: none;
+    margin-bottom: -100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font: 0.2em;
+    margin: 2em;
+    overflow: auto;
+    opacity: 0;
+    will-change: opacity;
+    transition: opacity 0.5s linear 1s;
+  }
+</style>
+
+<script src="./intro.ts"></script>

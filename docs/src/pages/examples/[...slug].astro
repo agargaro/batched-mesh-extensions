@@ -1,0 +1,55 @@
+---
+import Loader from "./Loader.astro";
+
+export async function getStaticPaths() {
+  const examples = import.meta.glob("../../examples/**/index.ts");
+  const keys = Object.keys(examples) as string[];
+  const slugs = keys.map((key) =>
+    key.replace("../../examples/", "").replace("/index.ts", "")
+  );
+
+  return slugs.map((slug) => {
+    return {
+      params: { slug },
+    };
+  });
+}
+
+const slug = Astro.params.slug;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <script type="importmap" is:inline>
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
+          "@three.ez/main": "https://cdn.jsdelivr.net/npm/@three.ez/main@0.5.9/build/index.js",
+          "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions@0.0.6/build/webgl.js",
+          "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js@0.0.13/build/index.js",
+          "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
+        }
+      }
+    </script>
+    <Loader slug={slug} />
+  </head>
+  <body></body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,5 +1,6 @@
 import { BatchedMesh } from 'three';
 import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../SquareDataTexture.js';
+import { patchBatchedMeshMaterial } from '../Patch.js';
 
 type UniformSchema = { [x: string]: UniformType };
 type UniformSchemaShader = { vertex?: UniformSchema; fragment?: UniformSchema };
@@ -58,10 +59,13 @@ BatchedMesh.prototype.setUniformAt = function (id: number, name: string, value: 
   this.uniformsTexture.enqueueUpdate(id);
 };
 
-// TODO this must be changed if we want to support LODs
 BatchedMesh.prototype.initUniformsPerInstance = function (schema: UniformSchemaShader): void {
+  if (this.uniformsTexture) throw new Error('"initUniformsPerInstance" must be called only once.');
+
   const { channels, pixelsPerInstance, uniformMap, fetchInFragmentShader } = this.getUniformSchemaResult(schema);
   this.uniformsTexture = new SquareDataTexture(Float32Array, channels, pixelsPerInstance, this.maxInstanceCount, uniformMap, fetchInFragmentShader);
+
+  patchBatchedMeshMaterial(this);
 };
 
 BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaShader): UniformSchemaResult {

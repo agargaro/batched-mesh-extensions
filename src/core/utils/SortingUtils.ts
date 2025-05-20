@@ -2,6 +2,8 @@ import { BatchedMesh } from 'three';
 import { radixSort, RadixSortOptions } from 'three/addons/utils/SortUtils.js';
 import { MultiDrawRenderItem } from './MultiDrawRenderList.js';
 
+type radixSortCallback = (list: MultiDrawRenderItem[]) => void;
+
 /**
  * Creates a radix sort function specifically for sorting `BatchedMesh` instances.
  * The sorting is based on the `depth` property of each `MultiDrawRenderItem`.
@@ -10,9 +12,9 @@ import { MultiDrawRenderItem } from './MultiDrawRenderList.js';
  * @returns A radix sort function.
  */
 // Reference: https://github.com/mrdoob/three.js/blob/master/examples/webgl_mesh_batch.html#L291
-export function createRadixSort(target: BatchedMesh): typeof radixSort<MultiDrawRenderItem> {
+export function createRadixSort(target: BatchedMesh): radixSortCallback {
   const options: RadixSortOptions<MultiDrawRenderItem> = {
-    get: (el) => el.depthSort,
+    get: (el) => el.zSort,
     aux: new Array(target.maxInstanceCount),
     reversed: null
   };
@@ -27,16 +29,16 @@ export function createRadixSort(target: BatchedMesh): typeof radixSort<MultiDraw
     let minZ = Infinity;
     let maxZ = -Infinity;
 
-    for (const { depth } of list) {
-      if (depth > maxZ) maxZ = depth;
-      if (depth < minZ) minZ = depth;
+    for (const { z } of list) {
+      if (z > maxZ) maxZ = z;
+      if (z < minZ) minZ = z;
     }
 
     const depthDelta = maxZ - minZ;
     const factor = (2 ** 32 - 1) / depthDelta;
 
     for (const item of list) {
-      item.depthSort = (item.depth - minZ) * factor;
+      item.zSort = (item.z - minZ) * factor;
     }
 
     radixSort(list, options);
@@ -45,10 +47,10 @@ export function createRadixSort(target: BatchedMesh): typeof radixSort<MultiDraw
 
 /** @internal */
 export function sortOpaque(a: MultiDrawRenderItem, b: MultiDrawRenderItem): number {
-  return a.depth - b.depth;
+  return a.z - b.z;
 }
 
 /** @internal */
 export function sortTransparent(a: MultiDrawRenderItem, b: MultiDrawRenderItem): number {
-  return b.depth - a.depth;
+  return b.z - a.z;
 }

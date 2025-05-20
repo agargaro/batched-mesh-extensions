@@ -1,6 +1,6 @@
 import { BatchedMesh, WebGLProgramParametersWithUniforms, WebGLRenderer } from 'three';
 
-export function patchBatchedMesh(batchedMesh: BatchedMesh): void {
+export function patchBatchedMeshMaterial(batchedMesh: BatchedMesh): void {
   const material = batchedMesh.material;
   const onBeforeCompileBase = material.onBeforeCompile.bind(material);
 

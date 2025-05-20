@@ -21,6 +21,7 @@ This library adds and overrides some `BatchedMesh` methods to improve performanc
 
 - [**Spatial indexing (dynamic BVH)**](#spatial-indexing-dynamic-bvh): *speed up raycasting and frustum culling.*
 - [**Per-instance uniforms**](#per-instance-uniforms-webglrenderer-only): *assign unique shader data to individual instances.* (**WebGLRenderer only)**
+- [**Level of Detail (LOD)**](#level-of-detail-lod): *dynamically adjust instance detail based on distance.*
 
 ## Live Examples
 
@@ -62,7 +63,8 @@ Or you can import it from CDN:
     "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgl.js",
-    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
+    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
+    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>
@@ -78,7 +80,8 @@ Or you can import it from CDN:
     "three": "https://cdn.jsdelivr.net/npm/three/build/three.webgpu.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/",
     "@three.ez/batched-mesh-extensions": "https://cdn.jsdelivr.net/npm/@three.ez/batched-mesh-extensions/build/webgpu.js",
-    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js"
+    "bvh.js": "https://cdn.jsdelivr.net/npm/bvh.js/build/index.js",
+    "meshoptimizer": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.23.0/+esm"
   }
 }
 </script>
@@ -97,20 +100,6 @@ Setting a margin makes BVH updating faster, but may make raycasting and frustum 
 myBatchedMesh.computeBVH(renderer.coordinateSystem, { margin: 0 }); // margin is optional
 ```
 
-### Per-instance uniforms (WebGLRenderer only)
-
-Assign unique shader uniforms to each instance, working with every materials.
-
-```ts
-import { patchBatchedMesh } from '@three.ez/batched-mesh-extensions';
-
-patchBatchedMesh(batchedMesh);
-myBatchedMesh.initUniformsPerInstance({ vertex: { noise: 'float' }, fragment: { metalness: 'float', roughness: 'float', emissive: 'vec3' } });
-
-myBatchedMesh.setUniformAt(index, 'noise', 0.5);
-myBatchedMesh.setUniformAt(index, 'emissive', new Color('red'));
-```
-
 **It's necessary to manually update the BVH after its creation with the following methods:**
 
 ```ts
@@ -121,8 +110,34 @@ myBatchedMesh.bvh.delete(instanceId);
 myBatchedMesh.bvh.clear();
 ```
 
+### Per-instance uniforms (WebGLRenderer only)
+
+Assign unique shader uniforms to each instance, working with every materials.
+
+```ts
+myBatchedMesh.initUniformsPerInstance({ vertex: { noise: 'float' }, fragment: { metalness: 'float', roughness: 'float', emissive: 'vec3' } });
+
+myBatchedMesh.setUniformAt(index, 'noise', 0.5);
+myBatchedMesh.setUniformAt(index, 'emissive', new Color('red'));
+```
+
+### Level of Detail (LOD)
+
+Improve rendering performance by dynamically adjusting the detail level of instances based on their distance from the camera. <br>
+Use simplified geometries for distant objects to optimize resources.
+
+Currently, only LODs that share the same geometry vertex array can be added. This will improve in the future.
+
+```ts
+const geometryId = batchedMesh.addGeometry(geometry, -1, reservedIndexCount);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD1, distanceLOD1);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD2, distanceLOD2);
+batchedMesh.addGeometryLOD(geometryId, geometryLOD3, distanceLOD3);
+```  
+
 ## Special thanks to
 
 - [gkjohnson](https://github.com/gkjohnson)
 - [manthrax](https://github.com/manthrax)
-  
+- [donmccurdy](https://github.com/donmccurdy)  
+- [ctrlmonster](https://github.com/Ctrlmonster)
