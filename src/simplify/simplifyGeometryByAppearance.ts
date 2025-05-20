@@ -3,7 +3,7 @@ import { simplify, SimplifyParams } from './simplify.js';
 
 export type SimplifyGeometryAuto = { geometry: BufferGeometry; ratio: number; appearanceError: number };
 
-export async function simplifyGeometryByAppearance(geometry: BufferGeometry, appearance: number, start: number, min = 0, threshold = 0.015, maxIteration = 10): Promise<SimplifyGeometryAuto> {
+export async function simplifyGeometryByAppearance(geometry: BufferGeometry, appearance: number, start: number, min = 0, threshold = 0.01, maxIteration = 12): Promise<SimplifyGeometryAuto> {
   if (!geometry.index) throw new Error('simplifyGeometry: non-indexed geometries are not currently supported.');
   if (geometry.groups.length > 0) throw new Error('simplifyGeometry: geometry groups are not currently supported.');
 
@@ -40,7 +40,7 @@ export async function simplifyGeometryByAppearance(geometry: BufferGeometry, app
     }
   }
 
-  if (bestTolerance > appearanceThreshold) {
+  if (bestTolerance > appearanceThreshold) { // TODO remove?
     console.warn('SimplifyByAppearanceError: simplification failed to converge to the appearance error. The best result is used instead.');
   }
 

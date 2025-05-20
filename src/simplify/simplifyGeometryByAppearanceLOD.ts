@@ -1,7 +1,9 @@
 import { BufferGeometry } from 'three';
 import { simplifyGeometryByAppearance } from './simplifyGeometryByAppearance.js';
 
-const defaultRange = [0.004, 0.01, 0.02, 0.04];
+const defaultRange = [0.005, 0.01, 0.035, 0.07];
+// TODO make more range preset // export const defaultRange = [0.01, 0.02, 0.04, 0.08];
+// TODO const defaultRange = [0.005, 0.01, 0.03, 0.06];
 
 export async function simplifyGeometryByAppearanceLOD(geometry: BufferGeometry, LODCount: number, range = defaultRange): Promise<BufferGeometry[]> {
   const geometries: BufferGeometry[] = [geometry];
@@ -10,6 +12,7 @@ export async function simplifyGeometryByAppearanceLOD(geometry: BufferGeometry, 
   for (let i = 0; i < LODCount; i++) {
     const result = await simplifyGeometryByAppearance(geometry, range[i], startRatio);
     startRatio = result.ratio;
+    console.log(`LOD ${i} - ratio ${result.ratio} - appearanceError ${result.appearanceError} - indexCount: ${result.geometry.index.count}`);
     geometries.push(result.geometry);
   }
 
@@ -20,6 +23,7 @@ export async function simplifyGeometriesByAppearanceLOD(geometries: BufferGeomet
   const result: BufferGeometry[][] = [];
 
   for (let i = 0; i < geometries.length; i++) {
+    console.log(`Geometry ${i} - index count: ${geometries[i].index.count}`);
     const range = (Array.isArray(ranges[i]) ? ranges[i] : ranges) as number[];
     const LODCount = Array.isArray(LODCounts) ? LODCounts[i] : LODCounts;
     result.push(await simplifyGeometryByAppearanceLOD(geometries[i], LODCount, range));
