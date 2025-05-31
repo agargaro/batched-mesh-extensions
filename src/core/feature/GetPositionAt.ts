@@ -9,15 +9,27 @@ declare module 'three' {
      * @returns The position of the instance as a `Vector3`.
      */
     getPositionAt(index: number, target?: Vector3): Vector3;
-
-    /** @internal */ getPositionAndMaxScaleOnAxisAt(index: number, position: Vector3): number;
-    /** @internal */ applyMatrixAtToSphere(index: number, sphere: Sphere, center: Vector3, radius: number): void;
+    /**
+     * Retrieves the position and maximum scale on any axis of a specific instance.
+     * @param index The index of the instance.
+     * @param position Optional `Vector3` to store the position result.
+     * @returns The maximum scale on any axis.
+     */
+    getPositionAndMaxScaleOnAxisAt(index: number, position: Vector3): number;
+    /**
+     * Applies the transformation matrix of a specific instance to a sphere.
+     * @param index The index of the instance.
+     * @param sphere The sphere to transform.
+     * @param center TODO
+     * @param radius TODO
+     */
+    applyMatrixAtToSphere(index: number, sphere: Sphere, center: Vector3, radius: number): void;
   }
 }
 
 const _position = new Vector3();
 
-BatchedMesh.prototype.getPositionAt = function (index: number, target = _position): Vector3 {
+export function getPositionAt(this: BatchedMesh, index: number, target = _position): Vector3 {
   const offset = index * 16;
   const array = this._matricesTexture.image.data as unknown as number[];
 
@@ -26,9 +38,9 @@ BatchedMesh.prototype.getPositionAt = function (index: number, target = _positio
   target.z = array[offset + 14];
 
   return target;
-};
+}
 
-BatchedMesh.prototype.getPositionAndMaxScaleOnAxisAt = function (index: number, position: Vector3): number {
+export function getPositionAndMaxScaleOnAxisAt(this: BatchedMesh, index: number, position: Vector3): number {
   const offset = index * 16;
   const array = this._matricesTexture.image.data as unknown as number[];
 
@@ -52,9 +64,9 @@ BatchedMesh.prototype.getPositionAndMaxScaleOnAxisAt = function (index: number, 
   position.z = array[offset + 14];
 
   return Math.sqrt(Math.max(scaleXSq, scaleYSq, scaleZSq));
-};
+}
 
-BatchedMesh.prototype.applyMatrixAtToSphere = function (index: number, sphere: Sphere, center: Vector3, radius: number): void {
+export function applyMatrixAtToSphere(this: BatchedMesh, index: number, sphere: Sphere, center: Vector3, radius: number): void {
   const offset = index * 16;
   const array = this._matricesTexture.image.data as unknown as number[];
 
@@ -90,4 +102,4 @@ BatchedMesh.prototype.applyMatrixAtToSphere = function (index: number, sphere: S
   const scaleZSq = te8 * te8 + te9 * te9 + te10 * te10;
 
   sphere.radius = radius * Math.sqrt(Math.max(scaleXSq, scaleYSq, scaleZSq));
-};
+}

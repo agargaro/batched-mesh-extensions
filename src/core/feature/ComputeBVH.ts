@@ -25,7 +25,7 @@ declare module 'three' {
      * BVH structure for optimized culling and intersection testing.
      * It's possible to create the BVH using the `computeBVH` method. Once created it will be updated automatically.
      */
-    bvh: BatchedMeshBVH;
+    bvh?: BatchedMeshBVH;
     /**
      * Creates and computes the BVH (Bounding Volume Hierarchy) for the instances.
      * It's recommended to create it when all the instance matrices have been assigned.
