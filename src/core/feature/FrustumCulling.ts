@@ -25,20 +25,34 @@ declare module 'three' {
     /**
      * Callback function called if an instance is inside the frustum.
      */
-    onFrustumEnter: OnFrustumEnterCallback;
+    onFrustumEnter?: OnFrustumEnterCallback;
 
     /**
      * Performs frustum culling and sorting.
      * @param camera The main camera used for rendering.
-     * @param cameraLOD TODO
+     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
      */
-    performFrustumCulling(camera: Camera, cameraLOD?: Camera): void;
-
-    /** @internal */ frustumCulling(camera: Camera, cameraLOD: Camera): void;
-    /** @internal */ updateIndexArray(): void;
-    /** @internal */ updateRenderList(): void;
-    /** @internal */ BVHCulling(camera: Camera, cameraLOD: Camera): void;
-    /** @internal */ linearCulling(camera: Camera, cameraLOD: Camera): void;
+    frustumCulling(camera: Camera, cameraLOD?: Camera): void;
+    /**
+     * Updates the index array for indirect rendering.
+     */
+    updateIndexArray(): void;
+    /**
+     * Updates the render list based on the current visibility and sorting settings.
+     */
+    updateRenderList(): void;
+    /**
+     * Performs BVH frustum culling.
+     * @param camera The main camera used for rendering.
+     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
+     */
+    BVHCulling(camera: Camera, cameraLOD: Camera): void;
+    /**
+     * Performs linear frustum culling.
+     * @param camera The main camera used for rendering.
+     * @param cameraLOD The camera used for LOD calculations (provided only if LODs are initialized).
+     */
+    linearCulling(camera: Camera, cameraLOD: Camera): void;
   }
 }
 
@@ -52,22 +66,19 @@ const _cameraLODPos = new Vector3();
 const _position = new Vector3();
 const _sphere = new Sphere();
 
-BatchedMesh.prototype.onBeforeRender = function (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
+export function onBeforeRender(this: BatchedMesh, renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
   // TODO check if nothing changed
-  this.performFrustumCulling(camera);
-};
+  this.frustumCulling(camera);
+}
 
-BatchedMesh.prototype.performFrustumCulling = function (camera, cameraLOD = camera) {
+export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = camera): void {
   if (!this._visibilityChanged && !this.perObjectFrustumCulled && !this.sortObjects) {
     return;
   }
 
-  this.frustumCulling(camera, cameraLOD);
   this._indirectTexture.needsUpdate = true;
   this._visibilityChanged = false;
-};
 
-BatchedMesh.prototype.frustumCulling = function (camera, cameraLOD) {
   const sortObjects = this.sortObjects;
   const perObjectFrustumCulled = this.perObjectFrustumCulled;
 
@@ -115,9 +126,9 @@ BatchedMesh.prototype.frustumCulling = function (camera, cameraLOD) {
 
     _renderList.reset();
   }
-};
+}
 
-BatchedMesh.prototype.updateIndexArray = function () {
+export function updateIndexArray(this: BatchedMesh): void {
   if (!this._visibilityChanged) return;
 
   const index = this.geometry.getIndex();
@@ -143,9 +154,9 @@ BatchedMesh.prototype.updateIndexArray = function () {
   }
 
   this._multiDrawCount = count;
-};
+}
 
-BatchedMesh.prototype.updateRenderList = function () {
+export function updateRenderList(this: BatchedMesh): void {
   const instanceInfo = this._instanceInfo;
   const geometryInfoList = this._geometryInfo;
 
@@ -160,9 +171,9 @@ BatchedMesh.prototype.updateRenderList = function () {
   }
 
   this._multiDrawCount = _renderList.array.length;
-};
+}
 
-BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) {
+export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera): void {
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
   const instanceInfo = this._instanceInfo;
@@ -214,9 +225,9 @@ BatchedMesh.prototype.BVHCulling = function (camera: Camera, cameraLOD: Camera) 
   });
 
   this._multiDrawCount = sortObjects ? _renderList.array.length : instancesCount;
-};
+}
 
-BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camera) {
+export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera): void {
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
   const instanceInfo = this._instanceInfo;
@@ -280,4 +291,4 @@ BatchedMesh.prototype.linearCulling = function (camera: Camera, cameraLOD: Camer
   }
 
   this._multiDrawCount = sortObjects ? _renderList.array.length : instancesCount;
-};
+}

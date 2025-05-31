@@ -3,7 +3,7 @@ import { } from 'three-mesh-bvh'; // include only types
 
 declare module 'three' {
   interface BatchedMesh {
-    checkObjectIntersection(raycaster: Raycaster, objectIndex: number, result: Intersection[]): void;
+    checkInstanceIntersection(raycaster: Raycaster, objectIndex: number, result: Intersection[]): void;
   }
 }
 
@@ -38,13 +38,13 @@ export function raycast(this: BatchedMesh, raycaster: Raycaster, result: Interse
   raycaster.far /= scaleFactor;
 
   if (this.bvh) {
-    this.bvh.raycast(raycaster, (instanceId) => this.checkObjectIntersection(raycaster, instanceId, result));
+    this.bvh.raycast(raycaster, (instanceId) => this.checkInstanceIntersection(raycaster, instanceId, result));
   } else {
     if (this.boundingSphere === null) this.computeBoundingSphere();
 
     if (raycaster.ray.intersectsSphere(this.boundingSphere)) {
       for (let i = 0, l = this._instanceInfo.length; i < l; i++) {
-        this.checkObjectIntersection(raycaster, i, result);
+        this.checkInstanceIntersection(raycaster, i, result);
       }
     }
   }
@@ -54,14 +54,14 @@ export function raycast(this: BatchedMesh, raycaster: Raycaster, result: Interse
   raycaster.far = originalFar;
 }
 
-export function checkObjectIntersection(this: BatchedMesh, raycaster: Raycaster, objectIndex: number, result: Intersection[]): void {
-  const info = this._instanceInfo[objectIndex];
+export function checkInstanceIntersection(this: BatchedMesh, raycaster: Raycaster, instanceId: number, result: Intersection[]): void {
+  const info = this._instanceInfo[instanceId];
   if (!info.active || !info.visible) return;
 
   const geometryId = info.geometryIndex;
   const geometryInfo = this._geometryInfo[geometryId];
 
-  this.getMatrixAt(objectIndex, _mesh.matrixWorld);
+  this.getMatrixAt(instanceId, _mesh.matrixWorld);
 
   _mesh.geometry.boundsTree = this.boundsTrees ? this.boundsTrees[geometryId] : undefined; // three-mesh-bvh compatibility
 
@@ -74,7 +74,7 @@ export function checkObjectIntersection(this: BatchedMesh, raycaster: Raycaster,
   _mesh.raycast(raycaster, _intersections);
 
   for (const intersect of _intersections) {
-    intersect.batchId = objectIndex;
+    intersect.batchId = instanceId;
     intersect.object = this;
     result.push(intersect);
   }
