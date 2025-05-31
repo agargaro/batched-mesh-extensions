@@ -12,7 +12,7 @@ export * from './core/feature/LOD.js';
 export * from './core/feature/Raycasting.js';
 export * from './core/feature/Uniforms.js';
 
-export * from './patch/EnhanceBatchedMeshPrototype.webgl.js';
+export * from './patch/ExtendsBatchedMeshPrototype.webgl.js';
 export * from './patch/PatchBatchedMeshMaterial.js';
 
 export * from './utils/CountUtils.js';

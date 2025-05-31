@@ -7,7 +7,7 @@ export * from './core/feature/GetPositionAt.js';
 export * from './core/feature/LOD.js';
 export * from './core/feature/Raycasting.js';
 
-export * from './patch/EnhanceBatchedMeshPrototype.webgpu.js';
+export * from './patch/ExtendsBatchedMeshPrototype.webgpu.js';
 export * from './patch/PatchBatchedMeshMaterial.js';
 
 export * from './utils/CountUtils.js';
