@@ -1,7 +1,7 @@
 import { BVHNode } from 'bvh.js';
 import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene, Sphere, Vector3, WebGLRenderer } from 'three';
-import { MultiDrawRenderItem, MultiDrawRenderList } from '../utils/MultiDrawRenderList.js';
-import { sortOpaque, sortTransparent } from '../utils/SortingUtils.js';
+import { MultiDrawRenderItem, MultiDrawRenderList } from '../MultiDrawRenderList.js';
+import { sortOpaque, sortTransparent } from '../../utils/SortingUtils.js';
 
 // TODO: fix LOD if no sorting and  no culling
 

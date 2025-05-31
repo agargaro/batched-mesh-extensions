@@ -1,6 +1,6 @@
 import { BatchedMesh } from 'three';
 import { radixSort, RadixSortOptions } from 'three/addons/utils/SortUtils.js';
-import { MultiDrawRenderItem } from './MultiDrawRenderList.js';
+import { MultiDrawRenderItem } from '../core/MultiDrawRenderList.js';
 
 type radixSortCallback = (list: MultiDrawRenderItem[]) => void;
 
@@ -10,8 +10,8 @@ type radixSortCallback = (list: MultiDrawRenderItem[]) => void;
  * This function dynamically adjusts for transparent materials by reversing the sort order if necessary.
  * @param target The `BatchedMesh` instance that contains the instances to be sorted.
  * @returns A radix sort function.
+ * @reference https://github.com/mrdoob/three.js/blob/master/examples/webgl_mesh_batch.html#L291
  */
-// Reference: https://github.com/mrdoob/three.js/blob/master/examples/webgl_mesh_batch.html#L291
 export function createRadixSort(target: BatchedMesh): radixSortCallback {
   const options: RadixSortOptions<MultiDrawRenderItem> = {
     get: (el) => el.zSort,

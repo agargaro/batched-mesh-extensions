@@ -30,14 +30,14 @@ declare module 'three' {
      * Creates and computes the BVH (Bounding Volume Hierarchy) for the instances.
      * It's recommended to create it when all the instance matrices have been assigned.
      * Once created it will be updated automatically.
-     * @param coordinateSystem TODO.
+     * @param coordinateSystem The coordinate system (webgl or webgpu) in which the BVH is computed.
      * @param config Optional configuration parameters object. See `BVHParams` for details.
      */
     computeBVH(coordinateSystem: CoordinateSystem, config?: BVHParams): void;
   }
 }
 
-BatchedMesh.prototype.computeBVH = function (coordinateSystem: CoordinateSystem, config: BVHParams = {}): void {
+export function computeBVH(this: BatchedMesh, coordinateSystem: CoordinateSystem, config: BVHParams = {}): void {
   this.bvh = new BatchedMeshBVH(this, coordinateSystem, config.margin, config.accurateCulling);
   this.bvh.create();
-};
+}
