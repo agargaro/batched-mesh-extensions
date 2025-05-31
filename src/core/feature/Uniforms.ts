@@ -2,10 +2,10 @@ import { BatchedMesh } from 'three';
 import { ChannelSize, SquareDataTexture, UniformMap, UniformMapType, UniformType, UniformValue, UniformValueObj } from '../SquareDataTexture.js';
 import { patchBatchedMeshMaterial } from '../../patch/PatchBatchedMeshMaterial.js';
 
-type UniformSchema = { [x: string]: UniformType };
-type UniformSchemaShader = { vertex?: UniformSchema; fragment?: UniformSchema };
+export type UniformSchema = { [x: string]: UniformType };
+export type UniformSchemaShader = { vertex?: UniformSchema; fragment?: UniformSchema };
 
-type UniformSchemaResult = {
+export type UniformSchemaResult = {
   channels: ChannelSize;
   pixelsPerInstance: number;
   uniformMap: UniformMap;
@@ -17,7 +17,7 @@ declare module 'three' {
     /**
      * Texture storing custom uniforms per instance.
      */
-    uniformsTexture: SquareDataTexture;
+    uniformsTexture?: SquareDataTexture;
     /**
      * Retrieves a uniform value for a specific instance.
      * @param id The index of the instance.
@@ -38,37 +38,34 @@ declare module 'three' {
      * @param schema The schema defining the uniforms.
      */
     initUniformsPerInstance(schema: UniformSchemaShader): void;
-    /** @internal */ getUniformSchemaResult(schema: UniformSchemaShader): UniformSchemaResult;
-    /** @internal */ getUniformOffset(size: number, tempOffset: number[]): number;
-    /** @internal */ getUniformSize(type: UniformType): number;
   }
 }
 
-BatchedMesh.prototype.getUniformAt = function (id: number, name: string, target?: UniformValueObj): UniformValue {
+export function getUniformAt(this: BatchedMesh, id: number, name: string, target?: UniformValueObj): UniformValue {
   if (!this.uniformsTexture) {
     throw new Error('Before get/set uniform, it\'s necessary to use "initUniformsPerInstance".');
   }
   return this.uniformsTexture.getUniformAt(id, name, target);
-};
+}
 
-BatchedMesh.prototype.setUniformAt = function (id: number, name: string, value: UniformValue): void {
+export function setUniformAt(this: BatchedMesh, id: number, name: string, value: UniformValue): void {
   if (!this.uniformsTexture) {
     throw new Error('Before get/set uniform, it\'s necessary to use "initUniformsPerInstance".');
   }
   this.uniformsTexture.setUniformAt(id, name, value);
   this.uniformsTexture.enqueueUpdate(id);
-};
+}
 
-BatchedMesh.prototype.initUniformsPerInstance = function (schema: UniformSchemaShader): void {
+export function initUniformsPerInstance(this: BatchedMesh, schema: UniformSchemaShader): void {
   if (this.uniformsTexture) throw new Error('"initUniformsPerInstance" must be called only once.');
 
-  const { channels, pixelsPerInstance, uniformMap, fetchInFragmentShader } = this.getUniformSchemaResult(schema);
+  const { channels, pixelsPerInstance, uniformMap, fetchInFragmentShader } = getUniformSchemaResult(schema);
   this.uniformsTexture = new SquareDataTexture(Float32Array, channels, pixelsPerInstance, this.maxInstanceCount, uniformMap, fetchInFragmentShader);
 
   patchBatchedMeshMaterial(this);
-};
+}
 
-BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaShader): UniformSchemaResult {
+export function getUniformSchemaResult(schema: UniformSchemaShader): UniformSchemaResult {
   let totalSize = 0;
   const uniformMap = new Map<string, UniformMapType>();
   const uniforms: { type: UniformType; name: string; size: number }[] = [];
@@ -78,7 +75,7 @@ BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaSh
 
   for (const name in vertexSchema) {
     const type = vertexSchema[name];
-    const size = this.getUniformSize(type);
+    const size = getUniformSize(type);
     totalSize += size;
     uniforms.push({ name, type, size });
     fetchInFragmentShader = false;
@@ -87,7 +84,7 @@ BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaSh
   for (const name in fragmentSchema) {
     if (!vertexSchema[name]) {
       const type = fragmentSchema[name];
-      const size = this.getUniformSize(type);
+      const size = getUniformSize(type);
       totalSize += size;
       uniforms.push({ name, type, size });
     }
@@ -97,7 +94,7 @@ BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaSh
 
   const tempOffset: number[] = [];
   for (const { name, size, type } of uniforms) {
-    const offset = this.getUniformOffset(size, tempOffset);
+    const offset = getUniformOffset(size, tempOffset);
     uniformMap.set(name, { offset, size, type });
   }
 
@@ -105,9 +102,9 @@ BatchedMesh.prototype.getUniformSchemaResult = function (schema: UniformSchemaSh
   const channels = Math.min(totalSize, 4) as ChannelSize;
 
   return { channels, pixelsPerInstance, uniformMap, fetchInFragmentShader };
-};
+}
 
-BatchedMesh.prototype.getUniformOffset = function (size: number, tempOffset: number[]): number {
+export function getUniformOffset(size: number, tempOffset: number[]): number {
   if (size < 4) {
     for (let i = 0; i < tempOffset.length; i++) {
       if (tempOffset[i] + size <= 4) {
@@ -124,9 +121,9 @@ BatchedMesh.prototype.getUniformOffset = function (size: number, tempOffset: num
   }
 
   return offset;
-};
+}
 
-BatchedMesh.prototype.getUniformSize = function (type: UniformType): number {
+export function getUniformSize(type: UniformType): number {
   switch (type) {
     case 'float': return 1;
     case 'vec2': return 2;
@@ -137,4 +134,4 @@ BatchedMesh.prototype.getUniformSize = function (type: UniformType): number {
     default:
       throw new Error(`Invalid uniform type: ${type}`);
   }
-};
+}
