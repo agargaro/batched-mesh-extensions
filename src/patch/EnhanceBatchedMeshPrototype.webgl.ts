@@ -5,7 +5,7 @@ import { applyMatrixAtToSphere, getPositionAndMaxScaleOnAxisAt, getPositionAt } 
 /**
  * Enhances the BatchedMesh prototype with additional methods.
  */
-export function enhanceBatchedMeshPrototype(): void {
+export function extendBatchedMeshPrototype(): void {
   BatchedMesh.prototype.computeBVH = computeBVH;
 
   BatchedMesh.prototype.getPositionAt = getPositionAt;

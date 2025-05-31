@@ -13,7 +13,7 @@
   [![Stars](https://badgen.net/github/stars/agargaro/batched-mesh-extensions)](https://github.com/agargaro/batched-mesh-extensions)
   [![BundlePhobia](https://badgen.net/bundlephobia/min/@three.ez/batched-mesh-extensions)](https://bundlephobia.com/package/@three.ez/batched-mesh-extensions)
   [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=agargaro_batched-mesh-extensions&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=agargaro_batched-mesh-extensions)
-  [![DeepScan grade](https://deepscan.io/api/teams/21196/projects/29481/branches/945757/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=21196&pid=29481&bid=945757)
+  [![DeepScan grade](https://deepscan.io/api/teams/21196/projects/29481/branches/948373/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=21196&pid=29481&bid=948373)
 
 </div>
 

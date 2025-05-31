@@ -1,7 +1,9 @@
-import { getBatchedMeshCount } from '@three.ez/batched-mesh-extensions';
+import { extendBatchedMeshPrototype, getBatchedMeshCount } from '@three.ez/batched-mesh-extensions';
 import { Main, PerspectiveCameraAuto } from '@three.ez/main';
 import { BatchedMesh, BoxGeometry, Color, Matrix4, MeshBasicMaterial, Scene, SphereGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
+
+extendBatchedMeshPrototype();
 
 const camera = new PerspectiveCameraAuto().translateZ(10);
 const scene = new Scene();
