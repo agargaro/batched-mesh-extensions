@@ -1,0 +1,150 @@
+---
+const toggleId = "sidebar-toggle";
+
+const currentPath = Astro.url.pathname;
+
+const examples = import.meta.glob("../../examples/**/index.ts");
+const entries = Object.entries(examples).map(([path]) => {
+  const match = path.match(/examples\/(?<folder>[^/]+)\/index\.ts/);
+  const name = match?.groups?.folder ?? "unknown";
+  return {
+    label: name,
+    href: `/batched-mesh-extensions/examples/${name}`,
+    isCurrent: currentPath === `/batched-mesh-extensions/examples/${name}`,
+  };
+});
+---
+
+
+<!-- Toggle button (mobile) -->
+<button class="sidebar-toggle"
+  aria-controls={toggleId}
+  aria-expanded="false"  
+  onclick={`document.getElementById('${toggleId}').classList.toggle('open')`} 
+  aria-expanded="false" 
+  aria-label="Menu" 
+  aria-controls="starlight__sidebar" 
+  class="sl-flex md:sl-hidden astro-m5ypedgg">
+   <svg aria-hidden="true" class="open-menu astro-m5ypedgg astro-lq7oo3uf" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"></path></svg>
+</button>
+
+
+<!-- Sidebar -->
+<nav id={toggleId} class="custom-sidebar" aria-label="Example Navigation">
+  <ul>
+    {
+      entries.map((entry) => (
+        <li>
+          <a
+            href={entry.href}
+            aria-current={entry.isCurrent ? "page" : undefined}
+            class={entry.isCurrent ? "active" : undefined}
+          >
+            <span class="label">{entry.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+
+    :root {
+      --sidebar-width: 260px;
+      --__sl-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+
+    .sidebar-toggle {
+    position: fixed;
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      padding: 0.75rem 1rem;
+      color: var(--sl-color-text, #ccc);
+      background-color: var(--sl-color-bg-sidebar, #1c1c1c);
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    nav.custom-sidebar {
+      font-family: var(--__sl-font);
+      flex: 0 0 var(--sidebar-width);
+      background-color: var(--sl-color-bg-sidebar, #1c1c1c);
+      padding: 1.5rem 1rem;
+      height: 100dvh;
+      overflow-y: auto;
+      border-right: 1px solid var(--sl-color-hairline, #2e2e2e);
+      box-sizing: border-box;
+      transition: transform 0.3s ease;
+    }
+
+    nav.custom-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    nav.custom-sidebar li + li {
+      margin-top: 0.5rem;
+    }
+
+    nav.custom-sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--sl-color-text, #ccc);
+      padding: 0.4rem 0.75rem;
+      border-radius: 0.25rem;
+      transition: background 0.2s ease;
+      font-size: var(--sl-text-sm, 0.875rem);
+      line-height: 1.4;
+    }
+
+    nav.custom-sidebar a:hover,
+    nav.custom-sidebar a:focus {
+      background-color: var(--sl-color-bg-hover, #2a2a2a);
+      color: var(--sl-color-white, #fff);
+    }
+
+    nav.custom-sidebar a.active,
+    nav.custom-sidebar a[aria-current="page"] {
+      background-color: var(--sl-color-accent, #007acc);
+      color: var(--sl-color-text-invert, white);
+      font-weight: 600;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+
+    .label {
+      flex: 1;
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+      .sidebar-toggle {
+        display: block;
+      }
+
+      nav.custom-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+
+      nav.custom-sidebar.open {
+        transform: translateX(0);
+      }
+    }
+  }
+</style>

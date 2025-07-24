@@ -68,7 +68,7 @@ const hidePreview = Astro.props.hidePreview ?? false;
 ---
 
 <div class="example-component-wrapper not-content">
-  {!hidePreview && <iframe src={`/instanced-mesh/examples/${Astro.props.path}?p=${Date.now()}`} title={Astro.props.path} class="example-iframe" />}
+  {!hidePreview && <iframe src={`/batched-mesh-extensions/examples/${Astro.props.path}?p=${Date.now()}`} title={Astro.props.path} class="example-iframe" />}
   {
     !Astro.props.hideStackblitz && (
       <div class="open-in-stackblitz-btn">
@@ -87,12 +87,15 @@ const hidePreview = Astro.props.hidePreview ?? false;
     box-shadow: var(--sl-shadow-md);
     position: relative;
   }
-  .example-iframe {
+  iframe.example-iframe {
     border: 0;
     height: 70vh;
     width: 100%;
     border-radius: 0.5rem 0.5rem 0 0;
     margin-bottom: -8px;
+    .sidebar {
+      display: none;
+    }
   }
 
   .open-in-stackblitz-btn {
