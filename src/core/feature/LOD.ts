@@ -1,4 +1,4 @@
-import { BatchedMesh, BufferGeometry } from 'three';
+import { BatchedMesh, BufferGeometry, TypedArray } from 'three';
 
 // TODO: add optional distance and first load function like InstancedMesh2
 
@@ -9,11 +9,11 @@ declare module 'three' {
     /**
      * Adds a Level of Detail (LOD) geometry to the BatchedMesh.
      * @param geometryId The ID of the geometry to which the LOD is being added.
-     * @param geometry The BufferGeometry to be added as LOD.
+     * @param geometryOrIndex The BufferGeometry to be added as LOD or the index array.
      * @param distance The distance at which this LOD should be used.
      * @param hysteresis Optional hysteresis value for LOD transition.
      */
-    addGeometryLOD(geometryId: number, geometry: BufferGeometry, distance: number, hysteresis?: number): void;
+    addGeometryLOD(geometryId: number, geometryOrIndex: BufferGeometry | TypedArray, distance: number, hysteresis?: number): void;
     /**
      * Retrieves the LOD index for a given distance.
      * @param LOD The array of LOD information.
@@ -24,8 +24,9 @@ declare module 'three' {
   }
 }
 
-export function addGeometryLOD(this: BatchedMesh, geometryId: number, geometry: BufferGeometry, distance: number, hysteresis = 0): void {
+export function addGeometryLOD(this: BatchedMesh, geometryId: number, geoOrIndex: BufferGeometry | TypedArray, distance: number, hysteresis = 0): void {
   const geometryInfo = this._geometryInfo[geometryId];
+  const srcIndexArray = (geoOrIndex as BufferGeometry).isBufferGeometry ? (geoOrIndex as BufferGeometry).index.array : geoOrIndex as TypedArray;
   distance = distance ** 2;
 
   geometryInfo.LOD ??= [{ start: geometryInfo.start, count: geometryInfo.count, distance: 0, hysteresis: 0 }];
@@ -33,7 +34,7 @@ export function addGeometryLOD(this: BatchedMesh, geometryId: number, geometry: 
   const LOD = geometryInfo.LOD;
   const lastLOD = LOD[LOD.length - 1];
   const start = lastLOD.start + lastLOD.count;
-  const count = geometry.index.count;
+  const count = srcIndexArray.length;
 
   if ((start - geometryInfo.start) + count > geometryInfo.reservedIndexCount) {
     throw new Error('BatchedMesh LOD: Reserved space request exceeds the maximum buffer size.');
@@ -41,7 +42,6 @@ export function addGeometryLOD(this: BatchedMesh, geometryId: number, geometry: 
 
   LOD.push({ start, count, distance, hysteresis });
 
-  const srcIndexArray = geometry.getIndex().array;
   const dstIndex = this.geometry.getIndex();
   const dstIndexArray = dstIndex.array;
   const vertexStart = geometryInfo.vertexStart;
