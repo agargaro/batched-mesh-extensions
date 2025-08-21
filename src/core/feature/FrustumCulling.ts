@@ -66,9 +66,11 @@ const _cameraLODPos = new Vector3();
 const _position = new Vector3();
 const _sphere = new Sphere();
 
+// TODO move it
 export function onBeforeRender(this: BatchedMesh, renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: any): void {
   // TODO check if nothing changed
   this.frustumCulling(camera);
+  this.uniformsTexture?.update(renderer);
 }
 
 export function frustumCulling(this: BatchedMesh, camera: Camera, cameraLOD = camera): void {
