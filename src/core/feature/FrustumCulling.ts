@@ -1,5 +1,5 @@
 import { BVHNode } from 'bvh.js';
-import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, Scene, Sphere, Vector3, WebGLRenderer } from 'three';
+import { BatchedMesh, BufferGeometry, Camera, Frustum, Material, Matrix4, OrthographicCamera, PerspectiveCamera, Scene, Sphere, Vector3, WebGLRenderer } from 'three';
 import { MultiDrawRenderItem, MultiDrawRenderList } from '../MultiDrawRenderList.js';
 import { sortOpaque, sortTransparent } from '../../utils/SortingUtils.js';
 
@@ -187,6 +187,11 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
   const onFrustumEnter = this.onFrustumEnter;
   let instancesCount = 0;
 
+  const orthographicCamera = camera as OrthographicCamera;
+  const viewHeight = (orthographicCamera.top - orthographicCamera.bottom) / orthographicCamera.zoom;
+  const perspectiveCamera = camera as PerspectiveCamera;
+  const invProj = (Math.tan(perspectiveCamera.fov * 0.5 * (Math.PI / 180))) ** 2;
+
   this.bvh.frustumCulling(_projScreenMatrix, (node: BVHNode<{}, number>) => {
     const index = node.object;
     const instance = instanceInfo[index];
@@ -201,8 +206,17 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
     let count: number;
 
     if (LOD) {
-      const distance = this.getPositionAt(index).distanceToSquared(_cameraLODPos);
-      const LODIndex = this.getLODIndex(LOD, distance);
+      _sphere.radius = geometryInfo.boundingSphere.radius;
+      let metric: number;
+      let LODIndex: number;
+      if ((camera as PerspectiveCamera).isPerspectiveCamera) {
+        const distance = this.getPositionAt(index).distanceToSquared(_cameraLODPos);
+        metric = getLODMetricPerspective(_sphere, invProj, distance);
+        LODIndex = this.getLODIndex(LOD, metric, true);
+      } else {
+        metric = getLODMetricOrthographic(_sphere, viewHeight);
+        LODIndex = this.getLODIndex(LOD, metric, false);
+      }
       if (onFrustumEnter && !onFrustumEnter(index, camera, cameraLOD, LODIndex)) return;
       start = LOD[LODIndex].start;
       count = LOD[LODIndex].count;
@@ -229,6 +243,13 @@ export function BVHCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera)
   this._multiDrawCount = sortObjects ? _renderList.array.length : instancesCount;
 }
 
+function getLODMetricPerspective(sphere: Sphere, invProj: number, distance: number): number {
+  return (sphere.radius ** 2) / (distance * invProj);
+}
+function getLODMetricOrthographic(sphere: Sphere, viewHeight: number): number {
+  return sphere.radius * 2 / viewHeight;
+}
+
 export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Camera): void {
   const index = this.geometry.getIndex();
   const bytesPerElement = index === null ? 1 : index.array.BYTES_PER_ELEMENT;
@@ -242,6 +263,11 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
   let instancesCount = 0;
 
   _frustum.setFromProjectionMatrix(_projScreenMatrix);
+
+  const orthographicCamera = camera as OrthographicCamera;
+  const viewHeight = (orthographicCamera.top - orthographicCamera.bottom) / orthographicCamera.zoom;
+  const perspectiveCamera = camera as PerspectiveCamera;
+  const invProj = (Math.tan(perspectiveCamera.fov * 0.5 * (Math.PI / 180))) ** 2;
 
   for (let i = 0, l = instanceInfo.length; i < l; i++) {
     const instance = instanceInfo[i];
@@ -268,8 +294,16 @@ export function linearCulling(this: BatchedMesh, camera: Camera, cameraLOD: Came
     if (!_frustum.intersectsSphere(_sphere)) continue;
 
     if (LOD) {
-      const distance = _sphere.center.distanceToSquared(_cameraLODPos);
-      const LODIndex = this.getLODIndex(LOD, distance);
+      let metric;
+      let LODIndex;
+      if ((camera as PerspectiveCamera).isPerspectiveCamera) {
+        const distance = _sphere.center.distanceToSquared(_cameraLODPos);
+        metric = getLODMetricPerspective(_sphere, invProj, distance);
+        LODIndex = this.getLODIndex(LOD, metric, true);
+      } else {
+        metric = getLODMetricOrthographic(_sphere, viewHeight);
+        LODIndex = this.getLODIndex(LOD, metric, false);
+      }
       if (onFrustumEnter && !onFrustumEnter(i, camera, cameraLOD, LODIndex)) continue;
       start = LOD[LODIndex].start;
       count = LOD[LODIndex].count;
