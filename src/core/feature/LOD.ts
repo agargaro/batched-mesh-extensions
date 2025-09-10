@@ -7,20 +7,20 @@ export type LODInfo = { start: number; count: number; distance: number; hysteres
 declare module 'three' {
   interface BatchedMesh {
     /**
-         * Adds a Level of Detail (LOD) geometry to the BatchedMesh.
-         * @param geometryId The ID of the geometry to which the LOD is being added.
-         * @param geometryOrIndex The BufferGeometry to be added as LOD or the index array.
-         * @param distance The screen-space metric (e.g., fraction of screen height) at which this LOD should be used.
-         * @param hysteresis Optional hysteresis value for LOD transition.
-         */
+     * Adds a Level of Detail (LOD) geometry to the BatchedMesh.
+     * @param geometryId The ID of the geometry to which the LOD is being added.
+     * @param geometryOrIndex The BufferGeometry to be added as LOD or the index array.
+     * @param distance The screen-space metric (e.g., fraction of screen height) at which this LOD should be used.
+     * @param hysteresis Optional hysteresis value for LOD transition.
+     */
     addGeometryLOD(geometryId: number, geometryOrIndex: BufferGeometry | TypedArray, distance: number, hysteresis?: number): void;
     /**
-         * Retrieves the LOD index for a given screen-space metric.
-         * @param LOD The array of LOD information.
-         * @param metric The calculated screen-space metric for the object.
-         * @param useDistSquared Whether to use the squared distance for LOD calculations.
-         * @returns The index of the appropriate LOD
-         */
+     * Retrieves the LOD index for a given screen-space metric.
+     * @param LOD The array of LOD information.
+     * @param metric The calculated screen-space metric for the object.
+     * @param useDistSquared Whether to use the squared distance for LOD calculations.
+     * @returns The index of the appropriate LOD
+     */
     getLODIndex(LOD: LODInfo[], metric: number, useDistSquared: boolean): number;
   }
 }
