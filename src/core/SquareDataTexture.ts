@@ -299,7 +299,7 @@ export class SquareDataTexture extends DataTexture {
   protected getUniformsVertexGLSL(textureName: string, indexName: string, indexType: string): string {
     if (this._fetchUniformsInFragmentShader) {
       return `
-        flat varying ${indexType} ez_v${indexName}; 
+        varying ${indexType} ez_v${indexName}; 
         void main() {
           ez_v${indexName} = ${indexName};`;
     }
@@ -332,7 +332,7 @@ export class SquareDataTexture extends DataTexture {
 
     return `
       uniform highp sampler2D ${textureName};  
-      flat varying ${indexType} ez_v${indexName};
+      varying ${indexType} ez_v${indexName};
       void main() {
         ${texelsFetch}
         ${getFromTexels}`;
@@ -382,7 +382,7 @@ export class SquareDataTexture extends DataTexture {
     let getVarying = '';
 
     for (const [name, { type }] of uniforms) {
-      declareVarying += `flat varying ${type} ez_v${name};\n`;
+      declareVarying += `varying ${type} ez_v${name};\n`;
       assignVarying += `ez_v${name} = ${name};\n`;
       getVarying += `${type} ${name} = ez_v${name};\n`;
     }
