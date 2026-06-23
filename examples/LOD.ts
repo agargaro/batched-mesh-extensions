@@ -1,6 +1,6 @@
 import { createRadixSort, extendBatchedMeshPrototype, getBatchedMeshLODCount } from '@three.ez/batched-mesh-extensions';
 import { Main, OrthographicCameraAuto, PerspectiveCameraAuto } from '@three.ez/main';
-import { performanceRangeLOD, qualityRangeLOD, simplifyGeometriesByErrorLOD } from '@three.ez/simplify-geometry';
+import { qualityRangeLOD, simplifyGeometriesByErrorLOD } from '@three.ez/simplify-geometry';
 import { AmbientLight, BatchedMesh, Color, DirectionalLight, Fog, Matrix4, MeshStandardMaterial, Quaternion, Scene, TorusKnotGeometry, Vector3, WebGLCoordinateSystem } from 'three';
 import { MapControls } from 'three/addons';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -85,8 +85,8 @@ batchedMesh.customSort = createRadixSort(batchedMesh);
 for (let i = 0; i < geometriesLODArray.length; i++) {
   const geometryLOD = geometriesLODArray[i];
   const geometryId = batchedMesh.addGeometry(geometryLOD[0], -1, LODIndexCount[i]);
-  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 0.20); // use from below 20% of the screen space
-  batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 0.10); // use below 10%
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[1], 0.2); // use from below 20% of the screen space
+  batchedMesh.addGeometryLOD(geometryId, geometryLOD[2], 0.1); // use below 10%
   batchedMesh.addGeometryLOD(geometryId, geometryLOD[3], 0.05); // etc
   batchedMesh.addGeometryLOD(geometryId, geometryLOD[4], 0.02);
 }

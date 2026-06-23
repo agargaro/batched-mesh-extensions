@@ -47,21 +47,21 @@
     "publish-major": "npm version major --git-tag-version false && npm run build && cd dist && npm publish --access public"
   },
   "devDependencies": {
-    "@eslint/js": "^9.26.0",
-    "@stylistic/eslint-plugin": "^4.2.0",
-    "@three.ez/main": "^0.5.10",
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@three.ez/main": "^0.5.12",
     "@three.ez/simplify-geometry": "^0.0.1",
     "@tweakpane/core": "^2.0.5",
-    "@types/three": "^0.176.0",
-    "eslint": "^9.26.0",
-    "meshoptimizer": "^0.23.0",
-    "three-mesh-bvh": "^0.9.0",
+    "@types/three": "^0.184.1",
+    "eslint": "^10.5.0",
+    "meshoptimizer": "^1.1.1",
+    "three-mesh-bvh": "^0.9.10",
     "tweakpane": "^4.0.5",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.1",
-    "vite": "^6.3.5",
-    "vite-plugin-externalize-deps": "^0.9.0",
-    "vite-plugin-static-copy": "^3.0.0"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0",
+    "vite": "^8.1.0",
+    "vite-plugin-externalize-deps": "^0.10.0",
+    "vite-plugin-static-copy": "^4.1.1"
   },
   "peerDependencies": {
     "three": ">=0.159.0"
