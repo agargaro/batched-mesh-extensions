@@ -13,7 +13,7 @@ export function patchBatchedMeshMaterial(batchedMesh: BatchedMesh): void {
       shader.vertexShader = shader.vertexShader.replace('void main() {', vertex);
       shader.fragmentShader = shader.fragmentShader.replace('void main() {', fragment);
 
-      shader.vertexShader = shader.vertexShader.replace('void main() {', 'void main() { float batchIndex = getIndirectIndex( gl_DrawID );');
+      shader.vertexShader = shader.vertexShader.replace('void main() {', 'void main() { float batchIndex = getIndirectIndex( gl_DrawID ) + 0.5;');
     }
 
     onBeforeCompileBase(shader, renderer);
