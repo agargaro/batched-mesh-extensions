@@ -9,7 +9,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
-    "outDir": "dist/src",
+    "outDir": "dist",
     "paths": {
       "@three.ez/batched-mesh-extensions": [
         "./src/index.webgl.js"
@@ -20,6 +20,7 @@
     "strict": true,
     "stripInternal": true,
     "strictNullChecks": false,
-    "target": "ES2020"
+    "target": "ES2020",
+    "rootDir": "."
   }
 }
